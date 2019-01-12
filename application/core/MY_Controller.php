@@ -2,7 +2,7 @@
 
 class MY_Controller extends CI_Controller
 {
-  	public $title 		= 'Sistem Informasi Akademik';
+  	private $title 		= 'KNN IG';
 	
 	public function __construct()
 	{
@@ -11,6 +11,7 @@ class MY_Controller extends CI_Controller
 		ini_set('xdebug.var_display_max_children', '256');
 		ini_set('xdebug.var_display_max_data', '10240');
 		date_default_timezone_set("Asia/Jakarta");
+		$this->data['global_title']	= $this->title;
 	}
 
 	protected function template($data, $module = '')

@@ -9,7 +9,7 @@ class KNearestNeighbor
 	private $continuousVariables;
 	private $categoricalVariables;
 	private $data;
-	private $values;
+	private $samples;
 	private $labels;
 
 	public function __construct($k = 1)
@@ -17,9 +17,9 @@ class KNearestNeighbor
 		$this->k = $k;
 	}
 
-	public function fit($data)
+	public function fit($data, $exclude_key = [])
 	{
-		$this->values 	= [];
+		$this->samples 	= [];
 		$this->labels 	= [];
 		$this->data 	= (array)$data;
 		foreach ($this->data as $row)
@@ -27,6 +27,11 @@ class KNearestNeighbor
 			$values = [];
 			foreach ($row as $key => $value)
 			{
+				if (in_array($key, $exclude_key))
+				{
+					continue;
+				}
+				
 				if ($this->criteriaType[$key] == 'label')
 				{
 					$this->labels []= $value;
@@ -36,7 +41,7 @@ class KNearestNeighbor
 					$values[$key] = $value;
 				}
 			}
-			$this->values []= $values;
+			$this->samples []= $values;
 		}
 	}
 
@@ -47,17 +52,18 @@ class KNearestNeighbor
 
 	public function continuousDistance($x, $y)
 	{
-		$it = new MultipleIterator();
-		$it->attachIterator(new ArrayIterator($x));
-		$it->attachIterator(new ArrayIterator($y));
-
-		$sum = 0;
-		foreach ($it as $values)
+		if (count($x) !== count($y))
 		{
-			$sum += pow($values[0] - $values[1], 2);
+			throw new InvalidArgumentException('Size of given arrays does not match');
 		}
 
-		return sqrt($sum);
+		$sum = 0;
+		foreach ($x as $i => $val)
+		{
+			$sum += ($val - $y[$i]) ** 2;
+		}
+
+		return sqrt((float)$sum);
 	}
 
 	public function categoricalDistance()
@@ -67,7 +73,7 @@ class KNearestNeighbor
 
 	public function tabulateCategory($key)
 	{
-		$values = array_column($this->values, $key);
+		$values = array_column($this->samples, $key);
 		$labels = $this->labels;
 		$it = new MultipleIterator();
 		$it->attachIterator(new ArrayIterator($values));

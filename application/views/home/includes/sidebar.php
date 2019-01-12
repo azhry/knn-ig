@@ -14,13 +14,13 @@
                 <li>
                     <a href="<?= base_url('home') ?>">
                         <i class="icon-home"></i>
-                        <span class="title">Dashboard</span>
+                        <span class="title">Home</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('home/daftar-kost') ?>">
-                        <i class="icon-list"></i>
-                        <span class="title">Daftar Kost</span>
+                    <a href="<?= base_url('home/data') ?>">
+                        <i class="fa fa-file"></i>
+                        <span class="title">Data</span>
                     </a>
                 </li>
             </ul>

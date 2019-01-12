@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class Score_types extends Eloquent
+class Attendances extends Eloquent
 {
-	protected $table		= 'score_types';
-	protected $primaryKey	= 'type_id';
+	protected $table		= 'patients';
+	protected $primaryKey	= 'patient_id';
 }
