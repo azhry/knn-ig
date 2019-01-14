@@ -15,16 +15,47 @@ class StratifiedKFold
 		$this->classDistribution 	= $this->countClassDistribution($this->data);
 	}
 
-	private function fold()
+	public function folds()
 	{
-		
+		shuffle($this->data);
+		$folds = [];
+		for ($i = 0; $i < $this->k; $i++)
+		{
+			$folds[$i] = [];
+			$labels = array_diff(array_keys($this->classDistribution), ['total']);
+			$labels = array_combine($labels, array_fill(0, count($labels), 0));
+			for ($j = 0; $j < count($this->data); $j++)
+			{
+				if ($labels[$this->data[$j][$this->label]] >= $this->classDistribution[$this->data[$j][$this->label]] / $this->k)
+				{
+					continue;
+				}
+				if (count($folds[$i]) >= $this->classDistribution['total'] / $this->k)
+				{
+					break;
+				}
+				$folds[$i] []= $this->data[$j];
+				$labels[$this->data[$j][$this->label]]++;
+				unset($this->data[$j]);
+			}
+			
+			// re-index data
+			$this->data = array_values($this->data);
+		}
+
+		foreach ($this->data as $data)
+		{
+			$folds[$this->k - 1] []= $data;
+		}
+		return $folds;
 	}
 
 	private function countClassDistribution($data)
 	{
 		$classDistribution['total'] = 0;
-		foreach ((array)$data as $row)
+		foreach ($data as $row)
 		{
+			$row = (array)$row;
 			$classDistribution['total']++;
 			if (isset($classDistribution[$row[$this->label]]))
 			{

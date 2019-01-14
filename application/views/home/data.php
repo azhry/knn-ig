@@ -5,10 +5,15 @@
 		<div class="col-md-8">
 			<div class="portlet box green">
 				<div class="portlet-title">
-					<div class="caption">Data</div>
+					<div class="caption">
+						Data
+					</div>
+					<div class="caption pull-right">
+						<a href="<?= base_url('home/clear-data') ?>" class="btn red btn-xs"><i class="fa fa-trash"></i> Clear Data</a>
+					</div>
 				</div>
 				<div class="portlet-body">
-					<table class="table table-striped table-hover table-bordered">
+					<table class="table table-striped table-hover table-bordered" id="sample_1">
 						<thead>
 							<tr>
 								<th>No.</th>
@@ -19,7 +24,7 @@
 								<th>Type</th>
 								<th>Area</th>
 								<th>Result of Treatment</th>
-								<th>Action</th>
+								<!-- <th>Action</th> -->
 							</tr>
 						</thead>
 						<tbody>
@@ -33,7 +38,7 @@
 									<td><?= $row->type ?></td>
 									<td><?= $row->area ?></td>
 									<td><?= $row->result_of_treatment ?></td>
-									<td>
+									<!-- <td>
 										<div class="btn-group">
 											<button class="btn blue" type="button">
 												<i class="fa fa-edit"></i> Edit
@@ -42,7 +47,7 @@
 												<i class="fa fa-trash"></i> Delete
 											</button>
 										</div>
-									</td>
+									</td> -->
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
@@ -100,7 +105,7 @@
 					<div class="caption">Import Data</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open('home/data') ?>
+					<?= form_open_multipart('home/data') ?>
 					<div class="form-group">
 						<label for="upload">Upload File (.xlsx)</label>
 						<input type="file" name="file" class="form-control">

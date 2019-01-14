@@ -19,8 +19,14 @@
                 </li>
                 <li>
                     <a href="<?= base_url('home/data') ?>">
-                        <i class="fa fa-file"></i>
+                        <i class="fa fa-file"></i> 
                         <span class="title">Data</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="<?= base_url('home/analysis') ?>">
+                        <i class="fa fa-line-chart"></i> 
+                        <span class="title">Analysis</span>
                     </a>
                 </li>
             </ul>
