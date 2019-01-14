@@ -13,13 +13,13 @@
             <ul class="page-sidebar-menu " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
                 <li>
                     <a href="<?= base_url('home') ?>">
-                        <i class="icon-home"></i>
+                        <i class="fa fa-home"></i>
                         <span class="title">Home</span>
                     </a>
                 </li>
                 <li>
                     <a href="<?= base_url('home/data') ?>">
-                        <i class="fa fa-file"></i> 
+                        <i class="fa fa-list"></i> 
                         <span class="title">Data</span>
                     </a>
                 </li>

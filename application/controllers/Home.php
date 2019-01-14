@@ -1,6 +1,7 @@
 <?php 
 require_once APPPATH . 'libraries/knn/KNearestNeighbor.php';
 require_once APPPATH . 'libraries/kfold/StratifiedKFold.php';
+require_once APPPATH . 'libraries/knn/ConfusionMatrix.php';
 
 class Home extends MY_Controller
 {
@@ -12,25 +13,43 @@ class Home extends MY_Controller
 
 	public function index()
 	{
-		// $this->load->model('Patients');
-		// $patients = Patients::get();
-		// $data = [];
-		// foreach ($patients as $patient)
-		// {
-		// 	$data []= [
-		// 		'patient_id'			=> $patient['patient_id'],
-		// 		'sex'					=> $patient['sex'],
-		// 		'age'					=> $patient['age'],
-		// 		'time'					=> $patient['time'],
-		// 		'number_of_warts'		=> $patient['number_of_warts'],
-		// 		'type'					=> $patient['type'],
-		// 		'area'					=> $patient['area'],
-		// 		'result_of_treatment'	=> $patient['result_of_treatment']
-		// 	];
-		// }
+		$this->load->model('Patients');
+		$patients = Patients::get();
+		$data 	= [];
+		$actual = [];
+		foreach ($patients as $patient)
+		{
+			$data []= [
+				'patient_id'			=> $patient['patient_id'],
+				'sex'					=> $patient['sex'],
+				'age'					=> $patient['age'],
+				'time'					=> $patient['time'],
+				'number_of_warts'		=> $patient['number_of_warts'],
+				'type'					=> $patient['type'],
+				'area'					=> $patient['area'],
+				'result_of_treatment'	=> $patient['result_of_treatment']
+			];
+
+			$actual []= $patient['result_of_treatment'];
+		}
+
+		$knn = new KNearestNeighbor();
+		$knn->setCriteriaType([
+			'sex'					=> 'categorical',
+			'age'					=> 'continuous',
+			'time'					=> 'continuous',
+			'number_of_warts'		=> 'continuous',
+			'type'					=> 'categorical',
+			'area'					=> 'continuous',
+			'result_of_treatment'	=> 'label'
+		]);
+		$knn->fit($data, ['patient_id']);
+		$predicted = $knn->predict($data);
+		$cm = new ConfusionMatrix($actual, $predicted);
+		var_dump($cm->classificationReport());
 		// $kfold = new StratifiedKFold($data, 'result_of_treatment');
 		// $kfold->folds();
-		// exit;
+		exit;
 		$this->data['title']	= 'Dashboard';
 		$this->data['content']	= 'Dashboard';
 		$this->template($this->data, $this->module);
