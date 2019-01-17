@@ -20,7 +20,28 @@ class SpreadsheetHandler
 		return $sheet;
 	}
 
-	public function saveToDB($sheet)
+	public function saveToGabungan($sheet)
+	{
+		$data = $this->serialize($sheet);
+		$this->CI->load->model('Patients');
+		Patients::insert($data);
+	}
+
+	public function saveToImmunotherapy($sheet)
+	{
+		$data = $this->serialize($sheet);
+		$this->CI->load->model('Immunotherapy');
+		Immunotherapy::insert($data);
+	}
+
+	public function saveToCyrotherapy($sheet)
+	{
+		$data = $this->serialize($sheet);
+		$this->CI->load->model('Cyrotherapy');
+		Cyrotherapy::insert($data);
+	}
+
+	private function serialize($sheet)
 	{
 		$data 		= [];
 		$columns 	= [];
@@ -53,7 +74,6 @@ class SpreadsheetHandler
 			}
 		}
 
-		$this->CI->load->model('Patients');
-		Patients::insert($data);
+		return $data;
 	}
 }
