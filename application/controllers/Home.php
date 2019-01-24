@@ -47,6 +47,23 @@ class Home extends MY_Controller
 		// $kfold = new StratifiedKFold($data, 'result_of_treatment');
 		// $kfold->folds();
 		// exit;
+
+		// require_once APPPATH . 'libraries/igr/InformationGainRankings.php';
+		// $igr = new InformationGainRankings();
+		// $igr->setCriteriaType([
+		// 	'sex'					=> 'categorical',
+		// 	'age'					=> 'continuous',
+		// 	'time'					=> 'continuous',
+		// 	'number_of_warts'		=> 'continuous',
+		// 	'type'					=> 'categorical',
+		// 	'area'					=> 'continuous',
+		// 	'result_of_treatment'	=> 'label'
+		// ]);
+		// $igr->categoricalDiscretization(array_column($data, 'type'), $actual);
+		// $igr->continuousDiscretization(array_column($data, 'time'), $actual);
+
+		// exit;
+
 		$this->data['title']	= 'Dashboard';
 		$this->data['content']	= 'Dashboard';
 		$this->template($this->data, $this->module);
