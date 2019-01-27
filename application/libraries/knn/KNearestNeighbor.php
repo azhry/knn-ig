@@ -33,7 +33,7 @@ class KNearestNeighbor
 				{
 					continue;
 				}
-				
+
 				if ($this->criteriaType[$key] == 'label')
 				{
 					$this->labels []= $value;
@@ -80,6 +80,7 @@ class KNearestNeighbor
 
 			foreach ($this->samples as $sample)
 			{
+				$categoricalDist = 0;
 				foreach ($sample as $key => $value)
 				{
 					$sampleContinuous	= [];
@@ -94,7 +95,12 @@ class KNearestNeighbor
 					}
 				}
 
-				$distances []= $this->continuousDistance($targetContinuous, $sampleContinuous) + $this->categoricalDistance($targetCategorical, $sampleCategorical);
+				foreach ($sample as $key => $value)
+				{
+					$categoricalDist += $this->categoricalDistance($key, $targetCategorical, $sampleCategorical);
+				}
+
+				$distances []= $this->continuousDistance($targetContinuous, $sampleContinuous) + $categoricalDist;
 			}
 
 			$labels 	= $this->labels;
@@ -133,7 +139,7 @@ class KNearestNeighbor
 		return sqrt((float)$sum);
 	}
 
-	private function categoricalDistance($x, $y)
+	private function categoricalDistance($key, $x, $y)
 	{
 		if (count($x) !== count($y))
 		{
@@ -143,17 +149,18 @@ class KNearestNeighbor
 		$sum = 0;
 		foreach ($x as $i => $val)
 		{
-			$sum += $this->calculateCategoricalDistance($val, $y[$i]) ** 2;
+			$sum += $this->calculateCategoricalDistance($key, $val, $y[$i]) ** 2;
 		}
 
 		return sqrt((float)$sum);
 	}
 
-	private function calculateCategoricalDistance($xv, $yv)
+	private function calculateCategoricalDistance($key, $xv, $yv)
 	{
 		$table 	= $this->tabulateCategory($key);
 		$result = 0;
 		$it 	= new MultipleIterator();
+		var_dump($table);
 		$it->attachIterator(new ArrayIterator($table[$xv]));
 		$it->attachIterator(new ArrayIterator($table[$yv]));
 		foreach ($it as $v)

@@ -24,6 +24,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="<?= base_url('home/feature-rankings') ?>">
+                        <i class="fa fa-list"></i> 
+                        <span class="title">Feature Rankings</span>
+                    </a>
+                </li>
+                <li>
                     <a href="<?= base_url('home/analysis') ?>">
                         <i class="fa fa-line-chart"></i> 
                         <span class="title">Analysis</span>

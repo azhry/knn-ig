@@ -17,6 +17,37 @@ class StratifiedKFold
 
 	public function folds()
 	{
+		$folds = [];
+		$splits = $this->splits();
+
+		foreach ($splits as $i => $split)
+		{
+			$test = $split;
+			$train = [];
+			for ($j = 0; $j < count($splits); $j++)
+			{
+				if ($j == $i)
+				{
+					continue;
+				}
+				
+				foreach ($splits[$j] as $row)
+				{
+					$train []= $row;
+				}
+			}
+
+			$folds []= [
+				'test'	=> $split,
+				'train'	=> $train
+			];
+		}
+
+		return $folds;
+	}
+
+	private function splits()
+	{
 		shuffle($this->data);
 		$folds = [];
 		for ($i = 0; $i < $this->k; $i++)

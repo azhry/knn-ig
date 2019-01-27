@@ -10,60 +10,6 @@ class Home extends MY_Controller
 
 	public function index()
 	{
-		// $this->load->model('Patients');
-		// $patients = Patients::get();
-		// $data 	= [];
-		// $actual = [];
-		// foreach ($patients as $patient)
-		// {
-		// 	$data []= [
-		// 		'patient_id'			=> $patient['patient_id'],
-		// 		'sex'					=> $patient['sex'],
-		// 		'age'					=> $patient['age'],
-		// 		'time'					=> $patient['time'],
-		// 		'number_of_warts'		=> $patient['number_of_warts'],
-		// 		'type'					=> $patient['type'],
-		// 		'area'					=> $patient['area'],
-		// 		'result_of_treatment'	=> $patient['result_of_treatment']
-		// 	];
-
-		// 	$actual []= $patient['result_of_treatment'];
-		// }
-
-		// $knn = new KNearestNeighbor();
-		// $knn->setCriteriaType([
-		// 	'sex'					=> 'categorical',
-		// 	'age'					=> 'continuous',
-		// 	'time'					=> 'continuous',
-		// 	'number_of_warts'		=> 'continuous',
-		// 	'type'					=> 'categorical',
-		// 	'area'					=> 'continuous',
-		// 	'result_of_treatment'	=> 'label'
-		// ]);
-		// $knn->fit($data, ['patient_id']);
-		// $predicted = $knn->predict($data);
-		// $cm = new ConfusionMatrix($actual, $predicted);
-		// var_dump($cm->classificationReport());
-		// $kfold = new StratifiedKFold($data, 'result_of_treatment');
-		// $kfold->folds();
-		// exit;
-
-		// require_once APPPATH . 'libraries/igr/InformationGainRankings.php';
-		// $igr = new InformationGainRankings();
-		// $igr->setCriteriaType([
-		// 	'sex'					=> 'categorical',
-		// 	'age'					=> 'continuous',
-		// 	'time'					=> 'continuous',
-		// 	'number_of_warts'		=> 'continuous',
-		// 	'type'					=> 'categorical',
-		// 	'area'					=> 'continuous',
-		// 	'result_of_treatment'	=> 'label'
-		// ]);
-		// $igr->categoricalDiscretization(array_column($data, 'type'), $actual);
-		// $igr->continuousDiscretization(array_column($data, 'time'), $actual);
-
-		// exit;
-
 		$this->data['title']	= 'Dashboard';
 		$this->data['content']	= 'Dashboard';
 		$this->template($this->data, $this->module);
@@ -255,13 +201,34 @@ class Home extends MY_Controller
 			}
 			Information_gain::insert($data);
 
-			var_dump($ranks);
-			exit;
+			$this->load->model('Immunotherapy');
+			$immunotherapy = Immunotherapy::get();
+			$result = $spreadsheet->fitData($immunotherapy, ['patient_id', 'created_at', 'updated_at']);
+			$data 	= $result['dataset'];
+			$actual = $result['actual'];
+
+			$ranks 		= $igr->rankFeatures($data, $actual);
+			$datasetId 	= 3;
+			$data 		= [];
+			foreach ($ranks as $key => $value)
+			{
+				$data []= [
+					'dataset_id'	=> $datasetId,
+					'feature'		=> $key,
+					'gain'			=> $value
+				];
+			}
+			Information_gain::insert($data);
+
+			$this->flashmsg('Features ranked');
+			redirect('home/feature-rankings');
 		}
 
-		$this->data['info_gain']	= Information_gain::get();
-		$this->data['title']		= 'Information Gain Rankings';
-		$this->data['content']		= 'feature_rankings';
+		$this->data['gabungan']			= Information_gain::where('dataset_id', 1)->get();
+		$this->data['immunotherapy']	= Information_gain::where('dataset_id', 2)->get();
+		$this->data['cyrotherapy']		= Information_gain::where('dataset_id', 3)->get();
+		$this->data['title']			= 'Information Gain Rankings';
+		$this->data['content']			= 'feature_rankings';
 		$this->template($this->data, $this->module);
 	}
 
@@ -275,34 +242,141 @@ class Home extends MY_Controller
 			require_once APPPATH . 'libraries/knn/KNearestNeighbor.php';
 			require_once APPPATH . 'libraries/knn/ConfusionMatrix.php';
 			require_once APPPATH . 'libraries/kfold/StratifiedKFold.php';
+			require_once APPPATH . 'libraries/SpreadsheetHandler.php';
 
-			$this->load->model('Patients');
-			$patients = Patients::get();
-			$data 	= [];
-			$actual = [];
-			foreach ($patients as $patient)
+			$type 				= $this->POST('type');
+			$numberOfFolds 		= $this->POST('k');
+			$threshold			= $this->POST('threshold');
+			$numberOfNeighbors	= $this->POST('number_of_neighbors');
+
+			$this->load->model('Experiments');
+			$this->load->model('Experiment_details');
+			$this->load->model('Information_gain');
+
+			$experiment = new Experiments();
+			$experiment->number_of_folds = $numberOfFolds;
+			$experiment->thresholds = $threshold;
+			$experiment->number_of_neighbors = $numberOfNeighbors;
+
+			$knn = new KNearestNeighbor($numberOfNeighbors);
+			$attributes = [
+				'sex'					=> 'categorical',
+				'age'					=> 'continuous',
+				'time'					=> 'continuous',
+				'number_of_warts'		=> 'continuous',
+				'type'					=> 'categorical',
+				'area'					=> 'continuous',
+				'result_of_treatment'	=> 'label'
+			];
+
+			switch ($type)
 			{
-				$data []= [
-					'patient_id'			=> $patient['patient_id'],
-					'sex'					=> $patient['sex'],
-					'age'					=> $patient['age'],
-					'time'					=> $patient['time'],
-					'number_of_warts'		=> $patient['number_of_warts'],
-					'type'					=> $patient['type'],
-					'area'					=> $patient['area'],
-					'result_of_treatment'	=> $patient['result_of_treatment']
-				];
+				case 'Gabungan':
+					$experiment->dataset_id = 1;
+					$features 			= Information_gain::where('dataset_id', 1)
+											->get();
+					$selectedFeatures 	= Information_gain::where('dataset_id', 1)
+											->where('gain', '>=', $threshold)
+											->get();
+					$features 			= array_column($features->toArray(), 'feature');
+					$selectedFeatures	= array_column($selectedFeatures->toArray(), 'feature');
+					$ignoredFeatures 	= array_diff($features, $selectedFeatures);
 
-				$actual []= $patient['result_of_treatment'];
+					$this->load->model('Patients');
+					$data = Patients::get();
+					break;
+
+				case 'Immunotherapy':
+					$attributes['induration_diameter'] = 'continuous';
+					$experiment->dataset_id = 3;
+					$features 			= Information_gain::where('dataset_id', 3)
+											->get();
+					$selectedFeatures 	= Information_gain::where('dataset_id', 3)
+											->where('gain', '>=', $threshold)
+											->get();
+					$features 			= array_column($features->toArray(), 'feature');
+					$selectedFeatures	= array_column($selectedFeatures->toArray(), 'feature');
+					$ignoredFeatures 	= array_diff($features, $selectedFeatures);
+
+					$this->load->model('Immunotherapy');
+					$data = Immunotherapy::get();
+					break;
+
+				case 'Cyrotherapy':
+					$experiment->dataset_id = 2;
+					$features 			= Information_gain::where('dataset_id', 2)
+											->get();
+					$selectedFeatures 	= Information_gain::where('dataset_id', 2)
+											->where('gain', '>=', $threshold)
+											->get();
+					$features 			= array_column($features->toArray(), 'feature');
+					$selectedFeatures	= array_column($selectedFeatures->toArray(), 'feature');
+					$ignoredFeatures 	= array_diff($features, $selectedFeatures);
+
+					$this->load->model('Cyrotherapy');
+					$data = Cyrotherapy::get();
+					break;
 			}
 
-			// TODO
-			
+			$experiment->save();
+
+			$knn->setCriteriaType($attributes);
+
+			$spreadsheet = new SpreadsheetHandler();
+			$result = $spreadsheet->fitData($data, ['patient_id', 'created_at', 'updated_at']);
+			$data 	= $result['dataset'];
+
+			$experimentDetails = [];
+
+			$kf = new StratifiedKFold($data, 'result_of_treatment');
+			foreach ($kf->folds() as $i => $fold)
+			{
+				$start = microtime(true);
+				$knn->fit($fold['train']);
+				$predicted = $knn->predict($fold['test']);
+				$cm = new ConfusionMatrix(array_column($fold['test'], 'result_of_treatment'), $predicted);
+				$result = $cm->classificationReport();
+				$end = microtime(true);
+				$execution_time = $end - $start;
+
+				$start = microtime(true);
+				$knn->fit($fold['train'], $ignoredFeatures);
+				$predicted = $knn->predict($fold['test']);
+				$cm = new ConfusionMatrix(array_column($fold['test'], 'result_of_treatment'), $predicted);
+				$result_igr = $cm->classificationReport();
+				$end = microtime(true);
+				$igr_execution_time = $end - $start;
+
+				$experimentDetails []= [
+					'experiment_id'			=> $experiment->experiment_id,
+					'fold_number'			=> $i + 1,
+					'tp'					=> $result['matrix']['tp'],
+					'tn'					=> $result['matrix']['tn'],
+					'fp'					=> $result['matrix']['fp'],
+					'fn'					=> $result['matrix']['fn'],
+					'accuracy'				=> $result['accuracy'],
+					'sensitivity'			=> $result['sensitivity'],
+					'specificity'			=> $result['specificity'],
+					'execution_time'		=> $execution_time,
+					'igr_tp'				=> $result_igr['matrix']['tp'],
+					'igr_tn'				=> $result_igr['matrix']['tn'],
+					'igr_fp'				=> $result_igr['matrix']['fp'],
+					'igr_fn'				=> $result_igr['matrix']['fn'],
+					'igr_accuracy'			=> $result_igr['accuracy'],
+					'igr_sensitivity'		=> $result_igr['sensitivity'],
+					'igr_specificity'		=> $result_igr['specificity'],
+					'igr_execution_time'	=> $igr_execution_time
+				];
+			}
+
+			$this->session->set_userdata('experiment_results', $experimentDetails);
+			Experiment_details::insert($experimentDetails);
 			redirect('home/analysis');
 		}
 
-		$this->data['title']	= 'Analysis';
-		$this->data['content']	= 'analysis';
+		$this->data['experiment_results']	= $this->session->userdata('experiment_results');
+		$this->data['title']				= 'Analysis';
+		$this->data['content']				= 'analysis';
 		$this->template($this->data, $this->module);
 	}
 

@@ -13,11 +13,6 @@ class InformationGainRankings
 		
 	}
 
-	public function fit($data, &$actual)
-	{
-
-	}
-
 	public function rankFeatures($data, $label)
 	{
 		$features 			= [];
