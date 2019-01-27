@@ -195,6 +195,76 @@ class Home extends MY_Controller
 		$this->template($this->data, $this->module);
 	}
 
+	public function feature_rankings()
+	{
+		$this->load->model('Information_gain');
+		if ($this->POST('update'))
+		{
+			Information_gain::truncate();
+			
+			require_once APPPATH . 'libraries/SpreadsheetHandler.php';
+			require_once APPPATH . 'libraries/igr/InformationGainRankings.php';
+
+			$this->load->model('Patients');
+			$patients = Patients::get();
+
+			$spreadsheet = new SpreadsheetHandler();
+			$result = $spreadsheet->fitData($patients, ['patient_id', 'created_at', 'updated_at']);
+			$data 	= $result['dataset'];
+			$actual = $result['actual'];
+
+			$igr = new InformationGainRankings();
+			$igr->setCriteriaType([
+				'sex'					=> 'categorical',
+				'age'					=> 'continuous',
+				'time'					=> 'continuous',
+				'number_of_warts'		=> 'continuous',
+				'type'					=> 'categorical',
+				'area'					=> 'continuous',
+				'result_of_treatment'	=> 'label'
+			]);
+			$ranks 		= $igr->rankFeatures($data, $actual);
+			$datasetId 	= 1;
+			$data 		= [];
+			foreach ($ranks as $key => $value)
+			{
+				$data []= [
+					'dataset_id'	=> $datasetId,
+					'feature'		=> $key,
+					'gain'			=> $value
+				];
+			}
+			Information_gain::insert($data);
+
+			$this->load->model('Cyrotherapy');
+			$cyrotherapy = Cyrotherapy::get();
+			$result = $spreadsheet->fitData($cyrotherapy, ['patient_id', 'created_at', 'updated_at']);
+			$data 	= $result['dataset'];
+			$actual = $result['actual'];
+
+			$ranks 		= $igr->rankFeatures($data, $actual);
+			$datasetId 	= 2;
+			$data 		= [];
+			foreach ($ranks as $key => $value)
+			{
+				$data []= [
+					'dataset_id'	=> $datasetId,
+					'feature'		=> $key,
+					'gain'			=> $value
+				];
+			}
+			Information_gain::insert($data);
+
+			var_dump($ranks);
+			exit;
+		}
+
+		$this->data['info_gain']	= Information_gain::get();
+		$this->data['title']		= 'Information Gain Rankings';
+		$this->data['content']		= 'feature_rankings';
+		$this->template($this->data, $this->module);
+	}
+
 	public function analysis()
 	{
 		if ($this->POST('submit'))

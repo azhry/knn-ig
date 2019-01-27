@@ -13,6 +13,30 @@ class SpreadsheetHandler
 		$this->CI =& get_instance();
 	}
 
+	public function fitData($data, $excludeKey = [])
+	{
+		$dataset 	= [];
+		$actual 	= [];
+		foreach ($data as $row)
+		{
+			$record = [];
+			foreach ($row->toArray() as $key => $value)
+			{
+				if (!in_array($key, $excludeKey))
+				{
+					$record[$key] = $value;
+				}
+			}
+			$dataset 	[]= $record;
+			$actual 	[]= $row['result_of_treatment'];
+		}
+
+		return [
+			'dataset'	=> $dataset,
+			'actual'	=> $actual
+		];
+	}
+
 	public function read($filepath)
 	{
 		$spreadsheet 	= $this->reader->load($filepath);

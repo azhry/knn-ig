@@ -13,7 +13,39 @@ class InformationGainRankings
 		
 	}
 
-	public function categoricalDiscretization($arr, $label)
+	public function fit($data, &$actual)
+	{
+
+	}
+
+	public function rankFeatures($data, $label)
+	{
+		$features 			= [];
+		$gains 				= [];
+		$continuousSplits 	= [];
+		foreach ($this->continuousVariables as $cv)
+		{
+			$arr 					= array_column($data, $cv);
+			$split 					= $this->continuousDiscretization($arr, $label);
+			$keys 					= array_keys($split);
+			$continuousSplits[$cv]	= $keys[0];
+			$features[$cv] 			= $split[$keys[0]];
+			$gains 					[]= $split[$keys[0]];
+		}
+
+		foreach ($this->categoricalVariables as $cv)
+		{
+			$arr 			= array_column($data, $cv);
+			$gain 			= $this->categoricalDiscretization($arr, $label);
+			$features[$cv] 	= $gain;
+			$gains 			[]= $gain;
+		}
+
+		array_multisort($gains, SORT_DESC, $features);
+		return $features;
+	}
+
+	private function categoricalDiscretization($arr, $label)
 	{
 		$globalEntropy 	= $this->calculateEntropy(array_count_values($label));
 		$table 			= $this->splitCategory($arr, $label);
@@ -75,10 +107,9 @@ class InformationGainRankings
 		return $info;
 	}
 
-	public function continuousDiscretization($arr, $label)
+	private function continuousDiscretization($arr, $label)
 	{
 		$globalEntropy = $this->calculateEntropy(array_count_values($label));
-		echo $globalEntropy;
 		array_multisort($arr, SORT_DESC, $label);
 		$gains = [];
 		for ($i = 0; $i < count($arr) - 1; $i++)
@@ -89,7 +120,6 @@ class InformationGainRankings
 			$info 						= $this->getInfo($entropy, $table);
 			$gains[(string)$threshold] 	= $globalEntropy - $info;
 		}
-		arsort($gains);
 		return $gains;
 	}
 
