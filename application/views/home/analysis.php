@@ -197,6 +197,42 @@
 								<?php endforeach; ?>
 							<?php endif; ?>
 						</tbody>
+						<?php if (isset($experiment_results)): ?>
+						<tfoot>
+							<tr>
+								<th>Average</th>
+								<th colspan="8">
+									Accuracy: <?= round(array_sum(array_column($experiment_results, 'accuracy')) / count($experiment_results), 2) ?><br>
+									Sensitivity: <?= round(array_sum(array_column($experiment_results, 'sensitivity')) / count($experiment_results), 2) ?><br>
+									Specificity: <?= round(array_sum(array_column($experiment_results, 'specificity')) / count($experiment_results), 2) ?><br>
+									Execution Time: <?= round(array_sum(array_column($experiment_results, 'execution_time')) / count($experiment_results), 2) ?>s
+								</th>
+								<th colspan="8">
+									Accuracy: <?= round(array_sum(array_column($experiment_results, 'igr_accuracy')) / count($experiment_results), 2) ?><br>
+									Sensitivity: <?= round(array_sum(array_column($experiment_results, 'igr_sensitivity')) / count($experiment_results), 2) ?><br>
+									Specificity: <?= round(array_sum(array_column($experiment_results, 'igr_specificity')) / count($experiment_results), 2) ?><br>
+									Execution Time: <?= round(array_sum(array_column($experiment_results, 'igr_execution_time')) / count($experiment_results), 2) ?>s
+								</th>
+							</tr>
+							<tr>
+								<th>Features</th>
+								<th colspan="8">
+									<ul>
+										<?php foreach ($features['features'] as $feature): ?>
+											<li><?= $feature ?></li>
+										<?php endforeach; ?>
+									</ul>
+								</th>
+								<th colspan="8">
+									<ul>
+										<?php foreach ($features['selected_features'] as $feature): ?>
+											<li><?= $feature ?></li>
+										<?php endforeach; ?>
+									</ul>
+								</th>
+							</tr>
+						</tfoot>
+						<?php endif; ?>
 					</table>
 				</div>
 			</div>

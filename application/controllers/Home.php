@@ -370,11 +370,16 @@ class Home extends MY_Controller
 			}
 
 			$this->session->set_userdata('experiment_results', $experimentDetails);
+			$this->session->set_userdata('features', [
+				'features'			=> $features,
+				'selected_features'	=> $selectedFeatures
+			]);
 			Experiment_details::insert($experimentDetails);
 			redirect('home/analysis');
 		}
 
 		$this->data['experiment_results']	= $this->session->userdata('experiment_results');
+		$this->data['features']				= $this->session->userdata('features');
 		$this->data['title']				= 'Analysis';
 		$this->data['content']				= 'analysis';
 		$this->template($this->data, $this->module);
