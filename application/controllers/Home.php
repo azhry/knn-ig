@@ -72,41 +72,17 @@ class Home extends MY_Controller
 
 		if ($this->POST('import_gabungan'))
 		{
-			$this->upload('import', 'data', 'file', '.xlsx');
-			
-			require_once APPPATH . 'libraries/SpreadsheetHandler.php';
-			$excel = new SpreadsheetHandler();
-			$sheet = $excel->read(FCPATH . 'data/import.xlsx');
-			$excel->saveToGabungan($sheet);
-			
-			$this->flashmsg('New data imported');
-			redirect('home/data');
+			$this->import('saveToGabungan');
 		}
 
 		if ($this->POST('import_immunotherapy'))
 		{
-			$this->upload('import', 'data', 'file', '.xlsx');
-			
-			require_once APPPATH . 'libraries/SpreadsheetHandler.php';
-			$excel = new SpreadsheetHandler();
-			$sheet = $excel->read(FCPATH . 'data/import.xlsx');
-			$excel->saveToImmunotherapy($sheet);
-			
-			$this->flashmsg('New data imported');
-			redirect('home/data');
+			$this->import('saveToImmunotherapy');
 		}
 
 		if ($this->POST('import_cyrotherapy'))
 		{
-			$this->upload('import', 'data', 'file', '.xlsx');
-			
-			require_once APPPATH . 'libraries/SpreadsheetHandler.php';
-			$excel = new SpreadsheetHandler();
-			$sheet = $excel->read(FCPATH . 'data/import.xlsx');
-			$excel->saveToCyrotherapy($sheet);
-			
-			$this->flashmsg('New data imported');
-			redirect('home/data');
+			$this->import('saveToCyrotherapy');
 		}
 
 		if ($this->POST('delete'))
@@ -139,6 +115,19 @@ class Home extends MY_Controller
 		$this->data['title']			= 'Data';
 		$this->data['content']			= 'data';
 		$this->template($this->data, $this->module);
+	}
+
+	private function import($functionName)
+	{
+		$this->upload('import', 'data', 'file', '.xlsx');
+			
+		require_once APPPATH . 'libraries/SpreadsheetHandler.php';
+		$excel = new SpreadsheetHandler();
+		$sheet = $excel->read(FCPATH . 'data/import.xlsx');
+		call_user_func_array([$excel, $functionName], [$sheet]);
+		
+		$this->flashmsg('New data imported');
+		redirect('home/data');
 	}
 
 	public function feature_rankings()
@@ -206,7 +195,16 @@ class Home extends MY_Controller
 			$result = $spreadsheet->fitData($immunotherapy, ['patient_id', 'created_at', 'updated_at']);
 			$data 	= $result['dataset'];
 			$actual = $result['actual'];
-
+			$igr->setCriteriaType([
+				'sex'					=> 'categorical',
+				'age'					=> 'continuous',
+				'time'					=> 'continuous',
+				'number_of_warts'		=> 'continuous',
+				'type'					=> 'categorical',
+				'area'					=> 'continuous',
+				'result_of_treatment'	=> 'label',
+				'induration_diameter'	=> 'continuous'
+			]);
 			$ranks 		= $igr->rankFeatures($data, $actual);
 			$datasetId 	= 3;
 			$data 		= [];
@@ -225,8 +223,8 @@ class Home extends MY_Controller
 		}
 
 		$this->data['gabungan']			= Information_gain::where('dataset_id', 1)->get();
-		$this->data['immunotherapy']	= Information_gain::where('dataset_id', 2)->get();
-		$this->data['cyrotherapy']		= Information_gain::where('dataset_id', 3)->get();
+		$this->data['immunotherapy']	= Information_gain::where('dataset_id', 3)->get();
+		$this->data['cyrotherapy']		= Information_gain::where('dataset_id', 2)->get();
 		$this->data['title']			= 'Information Gain Rankings';
 		$this->data['content']			= 'feature_rankings';
 		$this->template($this->data, $this->module);
@@ -275,6 +273,7 @@ class Home extends MY_Controller
 			switch ($type)
 			{
 				case 'Gabungan':
+					$classes = [1, 2];
 					$experiment->dataset_id = 1;
 					$features 			= Information_gain::where('dataset_id', 1)
 											->get();
@@ -290,6 +289,7 @@ class Home extends MY_Controller
 					break;
 
 				case 'Immunotherapy':
+					$classes = [1, 0];
 					$attributes['induration_diameter'] = 'continuous';
 					$experiment->dataset_id = 3;
 					$features 			= Information_gain::where('dataset_id', 3)
@@ -306,6 +306,7 @@ class Home extends MY_Controller
 					break;
 
 				case 'Cyrotherapy':
+					$classes = [1, 0];
 					$experiment->dataset_id = 2;
 					$features 			= Information_gain::where('dataset_id', 2)
 											->get();
@@ -347,7 +348,7 @@ class Home extends MY_Controller
 						break;
 				}
 
-				$cm = new ConfusionMatrix(array_column($fold['test'], 'result_of_treatment'), $predicted);
+				$cm = new ConfusionMatrix(array_column($fold['test'], 'result_of_treatment'), $predicted, $classes);
 				$result = $cm->classificationReport();
 				$end = microtime(true);
 				$execution_time = $end - $start;
