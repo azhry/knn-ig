@@ -236,6 +236,8 @@ class Home extends MY_Controller
 	{
 		if ($this->POST('submit'))
 		{
+			$clickedButton = $this->POST('method');
+
 			// set max_execution_time to infinity
 			ini_set('max_execution_time', 0);
 
@@ -257,6 +259,7 @@ class Home extends MY_Controller
 			$experiment->number_of_folds = $numberOfFolds;
 			$experiment->thresholds = $threshold;
 			$experiment->number_of_neighbors = $numberOfNeighbors;
+			$experiment->type = $clickedButton == 'Classify with KNN' ? 'KNN' : 'IGR - KNN';
 
 			$knn = new KNearestNeighbor($numberOfNeighbors);
 			$attributes = [
@@ -333,19 +336,21 @@ class Home extends MY_Controller
 			{
 				$start = microtime(true);
 				$knn->fit($fold['train']);
-				$predicted = $knn->predict($fold['test']);
+				switch ($clickedButton)
+				{
+					case 'Classify with KNN':
+						$predicted = $knn->predict($fold['test']);
+						break;
+
+					case 'Classify with IGR - KNN':
+						$predicted = $knn->predict($fold['test'], $ignoredFeatures);
+						break;
+				}
+
 				$cm = new ConfusionMatrix(array_column($fold['test'], 'result_of_treatment'), $predicted);
 				$result = $cm->classificationReport();
 				$end = microtime(true);
 				$execution_time = $end - $start;
-
-				$start = microtime(true);
-				$knn->fit($fold['train'], $ignoredFeatures);
-				$predicted = $knn->predict($fold['test']);
-				$cm = new ConfusionMatrix(array_column($fold['test'], 'result_of_treatment'), $predicted);
-				$result_igr = $cm->classificationReport();
-				$end = microtime(true);
-				$igr_execution_time = $end - $start;
 
 				$experimentDetails []= [
 					'experiment_id'			=> $experiment->experiment_id,
@@ -357,29 +362,31 @@ class Home extends MY_Controller
 					'accuracy'				=> $result['accuracy'],
 					'sensitivity'			=> $result['sensitivity'],
 					'specificity'			=> $result['specificity'],
-					'execution_time'		=> $execution_time,
-					'igr_tp'				=> $result_igr['matrix']['tp'],
-					'igr_tn'				=> $result_igr['matrix']['tn'],
-					'igr_fp'				=> $result_igr['matrix']['fp'],
-					'igr_fn'				=> $result_igr['matrix']['fn'],
-					'igr_accuracy'			=> $result_igr['accuracy'],
-					'igr_sensitivity'		=> $result_igr['sensitivity'],
-					'igr_specificity'		=> $result_igr['specificity'],
-					'igr_execution_time'	=> $igr_execution_time
+					'execution_time'		=> $execution_time
 				];
 			}
 
-			$this->session->set_userdata('experiment_results', $experimentDetails);
-			$this->session->set_userdata('features', [
-				'features'			=> $features,
-				'selected_features'	=> $selectedFeatures
-			]);
+			switch ($clickedButton)
+			{
+				case 'Classify with KNN':
+					$this->session->set_userdata('knn_results', $experimentDetails);
+					$this->session->set_userdata('knn_features', $features);
+					break;
+
+				case 'Classify with IGR - KNN':
+					$this->session->set_userdata('igr_knn_results', $experimentDetails);
+					$this->session->set_userdata('igr_knn_features', $selectedFeatures);
+					break;
+			}
+			
 			Experiment_details::insert($experimentDetails);
 			redirect('home/analysis');
 		}
 
-		$this->data['experiment_results']	= $this->session->userdata('experiment_results');
-		$this->data['features']				= $this->session->userdata('features');
+		$this->data['knn_results']			= $this->session->userdata('knn_results');
+		$this->data['igr_knn_results']		= $this->session->userdata('igr_knn_results');
+		$this->data['knn_features']			= $this->session->userdata('knn_features');
+		$this->data['igr_knn_features']		= $this->session->userdata('igr_knn_features');
 		$this->data['title']				= 'Analysis';
 		$this->data['content']				= 'analysis';
 		$this->template($this->data, $this->module);
