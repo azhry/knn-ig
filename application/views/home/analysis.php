@@ -19,15 +19,15 @@
 					</div>
 					<div class="form-group">
 						<label for="threshold">Threshold</label>
-						<input class="form-control" type="number" step="any" name="threshold">
+						<input class="form-control" type="number" step="any" required name="threshold">
 					</div>
 					<div class="form-group">
 						<label for="k">Number of Fold</label>
-						<input class="form-control" type="number" value="10" min="1" name="k">
+						<input class="form-control" type="number" value="10" min="1" required name="k">
 					</div>
 					<div class="form-group">
 						<label for="number_of_neighbors">Number of Neighbors</label>
-						<input class="form-control" type="number" min="1" value="1" step="2" name="number_of_neighbors">
+						<input class="form-control" type="number" min="1" value="1" step="2" required name="number_of_neighbors">
 					</div>
 					<div class="form-group">
 						<label for="type">Type</label>
