@@ -9,7 +9,7 @@
 						Data
 					</div>
 					<div class="caption pull-right">
-						<a href="<?= base_url('home/clear-data') ?>" class="btn red btn-xs"><i class="fa fa-trash"></i> Clear Data</a>
+						<a href="<?= base_url('app/clear-data') ?>" class="btn red btn-xs"><i class="fa fa-trash"></i> Clear Data</a>
 					</div>
 				</div>
 				<div class="portlet-body">
@@ -163,7 +163,7 @@
 					<div class="caption">Add Data (Gabungan)</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open('home/data') ?>
+					<?= form_open('app/data') ?>
 					<div class="form-group">
 						<label for="sex">Sex</label>
 						<select required class="form-control" name="sex">
@@ -207,7 +207,7 @@
 					<div class="caption">Add Data (Immunotherapy)</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open('home/data') ?>
+					<?= form_open('app/data') ?>
 					<div class="form-group">
 						<label for="sex">Sex</label>
 						<select required class="form-control" name="sex">
@@ -251,7 +251,7 @@
 					<div class="caption">Add Data (Cyrotherapy)</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open('home/data') ?>
+					<?= form_open('app/data') ?>
 					<div class="form-group">
 						<label for="sex">Sex</label>
 						<select required class="form-control" name="sex">
@@ -295,7 +295,7 @@
 					<div class="caption">Import Data (Gabungan)</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open_multipart('home/data') ?>
+					<?= form_open_multipart('app/data') ?>
 					<div class="form-group">
 						<label for="upload">Upload File (.xlsx)</label>
 						<input type="file" name="file" class="form-control">
@@ -311,7 +311,7 @@
 					<div class="caption">Import Data (Immunotherapy)</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open_multipart('home/data') ?>
+					<?= form_open_multipart('app/data') ?>
 					<div class="form-group">
 						<label for="upload">Upload File (.xlsx)</label>
 						<input type="file" name="file" class="form-control">

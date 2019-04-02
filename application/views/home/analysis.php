@@ -8,7 +8,7 @@
 					<div class="caption">Get Result</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open('home/analysis') ?>
+					<?= form_open('app/analysis') ?>
 					<div class="form-group">
 						<label for="method">Method</label>
 						<select class="form-control" required name="method">

@@ -12,25 +12,25 @@
             <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
             <ul class="page-sidebar-menu " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
                 <li>
-                    <a href="<?= base_url('home') ?>">
+                    <a href="<?= base_url('app') ?>">
                         <i class="fa fa-home"></i>
                         <span class="title">Home</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('home/data') ?>">
+                    <a href="<?= base_url('app/data') ?>">
                         <i class="fa fa-list"></i> 
                         <span class="title">Data</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('home/feature-rankings') ?>">
+                    <a href="<?= base_url('app/feature-rankings') ?>">
                         <i class="fa fa-list"></i> 
                         <span class="title">Feature Rankings</span>
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url('home/analysis') ?>">
+                    <a href="<?= base_url('app/analysis') ?>">
                         <i class="fa fa-line-chart"></i> 
                         <span class="title">Analysis</span>
                     </a>

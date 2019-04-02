@@ -160,7 +160,6 @@ class KNearestNeighbor
 		$table 	= $this->tabulateCategory($key);
 		$result = 0;
 		$it 	= new MultipleIterator();
-		var_dump($table);
 		$it->attachIterator(new ArrayIterator($table[$xv]));
 		$it->attachIterator(new ArrayIterator($table[$yv]));
 		foreach ($it as $v)

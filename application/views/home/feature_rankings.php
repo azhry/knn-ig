@@ -84,7 +84,7 @@
 			</div>
 		</div>
 	</div>
-	<?= form_open('home/feature-rankings') ?>
+	<?= form_open('app/feature-rankings') ?>
 	<input type="submit" name="update" value="Rank Features" class="btn blue btn-lg">
 	<?= form_close() ?>
 	<!-- END PAGE CONTENT INNER -->
