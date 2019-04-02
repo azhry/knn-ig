@@ -327,7 +327,7 @@
 					<div class="caption">Import Data (Cyrotherapy)</div>
 				</div>
 				<div class="portlet-body">
-					<?= form_open_multipart('home/data') ?>
+					<?= form_open_multipart('app/data') ?>
 					<div class="form-group">
 						<label for="upload">Upload File (.xlsx)</label>
 						<input type="file" name="file" class="form-control">
