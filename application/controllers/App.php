@@ -77,12 +77,12 @@ class App extends MY_Controller
 
 		if ($this->POST('import_immunotherapy'))
 		{
-			$this->import('saveToImmunotherapy');
+			$this->import('saveToImmunotherapy', 'immunotherapy');
 		}
 
 		if ($this->POST('import_cyrotherapy'))
 		{
-			$this->import('saveToCyrotherapy');
+			$this->import('saveToCyrotherapy', 'cyrotherapy');
 		}
 
 		if ($this->POST('delete'))
@@ -117,13 +117,13 @@ class App extends MY_Controller
 		$this->template($this->data, $this->module);
 	}
 
-	private function import($functionName)
+	private function import($functionName, $filename = 'import')
 	{
-		$this->upload('import', 'data', 'file', '.xlsx');
+		$this->upload($filename, 'data', 'file', '.xlsx');
 			
 		require_once APPPATH . 'libraries/SpreadsheetHandler.php';
 		$excel = new SpreadsheetHandler();
-		$sheet = $excel->read(FCPATH . 'data/import.xlsx');
+		$sheet = $excel->read(FCPATH . 'data/' . $filename . '.xlsx');
 		call_user_func_array([$excel, $functionName], [$sheet]);
 		
 		$this->flashmsg('New data imported');
