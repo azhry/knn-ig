@@ -11,7 +11,7 @@ class App extends MY_Controller
 	public function index()
 	{
 		$this->data['title']	= 'Dashboard';
-		$this->data['content']	= 'Dashboard';
+		$this->data['content']	= 'dashboard';
 		$this->template($this->data, $this->module);
 	}
 
