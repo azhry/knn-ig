@@ -35,6 +35,12 @@
                         <span class="title">Analysis</span>
                     </a>
                 </li>
+                <li>
+                    <a href="<?= base_url('app/experiment-history') ?>">
+                        <i class="fa fa-list"></i> 
+                        <span class="title">Experiment History</span>
+                    </a>
+                </li>
             </ul>
             <!-- END SIDEBAR MENU -->
         </div>
