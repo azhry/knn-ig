@@ -111,7 +111,7 @@
 										<?php $row = (object)$row; ?>
 										<tr>
 											<td><?= $row->fold_number ?></td>
-											<td><?= round($row->execution_time, 2) ?></td>
+											<td><?= $row->execution_time ?></td>
 											<td><?= $row->tp ?></td>
 											<td><?= $row->tn ?></td>
 											<td><?= $row->fp ?></td>
@@ -142,7 +142,7 @@
 											<td>-</td>
 											<td>-</td>
 											<td><?= $row->fold_number ?></td>
-											<td><?= round($row->execution_time, 2) ?></td>
+											<td><?= $row->execution_time ?></td>
 											<td><?= $row->tp ?></td>
 											<td><?= $row->tn ?></td>
 											<td><?= $row->fp ?></td>
@@ -164,7 +164,7 @@
 										Accuracy: <?= round(array_sum(array_column($knn_results, 'accuracy')) / count($knn_results), 2) ?><br>
 										Sensitivity: <?= round(array_sum(array_column($knn_results, 'sensitivity')) / count($knn_results), 2) ?><br>
 										Specificity: <?= round(array_sum(array_column($knn_results, 'specificity')) / count($knn_results), 2) ?><br>
-										Execution Time: <?= round(array_sum(array_column($knn_results, 'execution_time')) / count($knn_results), 2) ?>s
+										Execution Time: <?= array_sum(array_column($knn_results, 'execution_time')) / count($knn_results) ?>s
 									<?php endif; ?>
 								</th>
 								<th colspan="8">
@@ -172,7 +172,7 @@
 										Accuracy: <?= round(array_sum(array_column($igr_knn_results, 'accuracy')) / count($igr_knn_results), 2) ?><br>
 										Sensitivity: <?= round(array_sum(array_column($igr_knn_results, 'sensitivity')) / count($igr_knn_results), 2) ?><br>
 										Specificity: <?= round(array_sum(array_column($igr_knn_results, 'specificity')) / count($igr_knn_results), 2) ?><br>
-										Execution Time: <?= round(array_sum(array_column($igr_knn_results, 'execution_time')) / count($igr_knn_results), 2) ?>s
+										Execution Time: <?= array_sum(array_column($igr_knn_results, 'execution_time')) / count($igr_knn_results) ?>s
 									<?php endif; ?>
 								</th>
 							</tr>

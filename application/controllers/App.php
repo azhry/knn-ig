@@ -117,6 +117,37 @@ class App extends MY_Controller
 		$this->template($this->data, $this->module);
 	}
 
+	public function experiment_history()
+	{
+		$this->load->model('Experiments');
+		$this->data['experiments'] = Experiments::with('dataset')->orderBy('created_at', 'DESC')->get();
+		$this->data['title']	= 'Experiment History';
+		$this->data['content']	= 'experiment_history';
+		$this->template($this->data, $this->module);	
+	}
+
+	public function experiment_details()
+	{
+		$this->data['experiment_id'] = $this->uri->segment(3);
+		if (!isset($this->data['experiment_id']))
+		{
+			$this->flashmsg('Required param is missing', 'danger');
+			redirect('app/experiment-history');
+		}
+		
+		$this->load->model('Experiments');
+		$this->data['experiments'] = Experiments::with('dataset', 'details')->find($this->data['experiment_id']);
+		if (!isset($this->data['experiments']))
+		{
+			$this->flashmsg('Experiment not found', 'danger');
+			redirect('app/experiment-history');
+		}
+
+		$this->data['title']	= 'Experiment Details';
+		$this->data['content']	= 'experiment_details';
+		$this->template($this->data, $this->module);
+	}
+
 	private function import($functionName, $filename = 'import')
 	{
 		$this->upload($filename, 'data', 'file', '.xlsx');
@@ -402,6 +433,8 @@ class App extends MY_Controller
 		Experiment_details::insert($experimentDetails);
 		redirect('app/analysis');
 	}
+
+
 
 	public function clear_data()
 	{
