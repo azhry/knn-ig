@@ -88,7 +88,7 @@
 										<?php $row = (object)$row; ?>
 										<tr>
 											<td><?= $row->fold_number ?></td>
-											<td><?= round($row->execution_time, 2) ?></td>
+											<td><?= $row->execution_time ?></td>
 											<td><?= $row->tp ?></td>
 											<td><?= $row->tn ?></td>
 											<td><?= $row->fp ?></td>
@@ -96,7 +96,7 @@
 											<td><?= round($row->accuracy, 2) ?></td>
 											<td><?= round($row->sensitivity, 2) ?></td>
 											<td><?= round($row->specificity, 2) ?></td>
-											<td><?= round($igr_knn_results[$i]['execution_time'], 2) ?></td>
+											<td><?= $igr_knn_results[$i]['execution_time'] ?></td>
 											<td><?= $igr_knn_results[$i]['tp'] ?></td>
 											<td><?= $igr_knn_results[$i]['tn'] ?></td>
 											<td><?= $igr_knn_results[$i]['fp'] ?></td>
