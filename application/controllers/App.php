@@ -398,8 +398,17 @@ class App extends MY_Controller
 					break;
 			}
 
+			for ($i = 0; $i < count($predicted); $i++)
+			{
+				echo $fold['test'][$i]['result_of_treatment'] . ' :: ' . $predicted[$i] . '<br>';
+			}
+			
+
 			$cm = new ConfusionMatrix(array_column($fold['test'], 'result_of_treatment'), $predicted, $classes);
 			$result = $cm->classificationReport();
+			$this->dump($result);
+			exit;
+
 			$end = microtime(true);
 			$execution_time = $end - $start;
 
