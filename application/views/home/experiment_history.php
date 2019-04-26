@@ -9,8 +9,8 @@
 						Experiment History
 					</div>
 				</div>
-				<div class="portlet-body table-responsive">
-					<table class="table table-striped table-hover table-bordered" id="sample_1">
+				<div class="portlet-body">
+					<table class="table table-striped table-hover table-bordered table-responsive" id="sample_1">
 						<thead>
 							<tr>
 								<th>Dataset</th>
