@@ -422,11 +422,13 @@ class App extends MY_Controller
 			case 'Classify with KNN':
 				$this->session->set_userdata('knn_results', $experimentDetails);
 				$this->session->set_userdata('knn_features', $features);
+				$this->session->set_userdata('knn_neighbors', $numberOfNeighbors);
 				break;
 
 			case 'Classify with IGR - KNN':
 				$this->session->set_userdata('igr_knn_results', $experimentDetails);
 				$this->session->set_userdata('igr_knn_features', $selectedFeatures);
+				$this->session->set_userdata('igr_knn_neighbors', $numberOfNeighbors);
 				break;
 		}
 		
@@ -452,5 +454,93 @@ class App extends MY_Controller
 	{
 		$this->session->sess_destroy();
 		redirect('app/analysis');
+	}
+
+	public function export()
+	{
+		$data['contents'] = [
+			['content' => [
+				['Uji Ke', 'Nilai K', 'Accuracy', 'Specificity', 'Sensitivity', 'Waktu Komputasi']
+			]],
+			['content' => [
+				['Uji Ke', 'Nilai K', 'True Positive', 'True Negative', 'False Positive', 'False Negative', 'Waktu Komputasi']
+			]],
+
+			['content' => [
+				['Uji Ke', 'Nilai K', 'Accuracy', 'Specificity', 'Sensitivity', 'Waktu Komputasi']
+			]],
+			['content' => [
+				['Uji Ke', 'Nilai K', 'True Positive', 'True Negative', 'False Positive', 'False Negative', 'Waktu Komputasi']
+			]]
+		];
+
+		$knn_results 		= $this->session->userdata('knn_results');
+		$knn_neighbors 		= $this->session->userdata('knn_neighbors');
+
+		$igr_knn_results	= $this->session->userdata('igr_knn_results');
+		$igr_knn_neighbors	= $this->session->userdata('igr_knn_neighbors');
+
+		if (isset($knn_results) && isset($igr_knn_results))
+		{
+			foreach ($knn_results as $i => $row)
+			{
+				$row = (object)$row;
+				$data['contents'][0]['content'] []= [
+					$row->fold_number, $knn_neighbors, round($row->accuracy * 100, 2) . '%', round($row->specificity * 100, 2) . '%', round($row->sensitivity * 100, 2) . '%', $row->execution_time
+				];
+
+				$data['contents'][1]['content'] []= [
+					$row->fold_number, $knn_neighbors, $row->tp, $row->tn, $row->fp, $row->fn, $row->execution_time
+				];
+			}
+
+			$avg_accuracy 		= array_sum(array_column($knn_results, 'accuracy')) / count($knn_results);
+			$avg_specificity 	= array_sum(array_column($knn_results, 'specificity')) / count($knn_results);
+			$avg_sensitivity 	= array_sum(array_column($knn_results, 'sensitivity')) / count($knn_results);
+			$avg_execution_time = array_sum(array_column($knn_results, 'execution_time')) / count($knn_results);
+			$data['contents'][0]['content'] []= [
+				'Rata-rata', $knn_neighbors, round($avg_accuracy * 100, 2) . '%', round($avg_specificity * 100, 2) . '%', round($avg_sensitivity * 100, 2) . '%', $avg_execution_time
+			];
+
+			$avg_tp 	= array_sum(array_column($knn_results, 'tp')) / count($knn_results);
+			$avg_tn 	= array_sum(array_column($knn_results, 'tn')) / count($knn_results);
+			$avg_fp 	= array_sum(array_column($knn_results, 'fp')) / count($knn_results);
+			$avg_fn 	= array_sum(array_column($knn_results, 'fn')) / count($knn_results);
+			$data['contents'][1]['content'] []= [
+				'Rata-rata', $knn_neighbors, $avg_tp, $avg_tn, $avg_fp, $avg_fn, $avg_execution_time
+			];
+
+			foreach ($igr_knn_results as $i => $row)
+			{
+				$row = (object)$row;
+				$data['contents'][2]['content'] []= [
+					$row->fold_number, $igr_knn_neighbors, round($row->accuracy * 100, 2) . '%', round($row->specificity * 100, 2) . '%', round($row->sensitivity * 100, 2) . '%', $row->execution_time
+				];
+
+				$data['contents'][3]['content'] []= [
+					$row->fold_number, $igr_knn_neighbors, $row->tp, $row->tn, $row->fp, $row->fn, $row->execution_time
+				];
+			}
+
+			$avg_accuracy 		= array_sum(array_column($igr_knn_results, 'accuracy')) / count($igr_knn_results);
+			$avg_specificity 	= array_sum(array_column($igr_knn_results, 'specificity')) / count($igr_knn_results);
+			$avg_sensitivity 	= array_sum(array_column($igr_knn_results, 'sensitivity')) / count($igr_knn_results);
+			$avg_execution_time = array_sum(array_column($igr_knn_results, 'execution_time')) / count($igr_knn_results);
+			$data['contents'][2]['content'] []= [
+				'Rata-rata', $igr_knn_neighbors, round($avg_accuracy * 100, 2) . '%', round($avg_specificity * 100, 2) . '%', round($avg_sensitivity * 100, 2) . '%', $avg_execution_time
+			];
+
+			$avg_tp 	= array_sum(array_column($igr_knn_results, 'tp')) / count($igr_knn_results);
+			$avg_tn 	= array_sum(array_column($igr_knn_results, 'tn')) / count($igr_knn_results);
+			$avg_fp 	= array_sum(array_column($igr_knn_results, 'fp')) / count($igr_knn_results);
+			$avg_fn 	= array_sum(array_column($igr_knn_results, 'fn')) / count($igr_knn_results);
+			$data['contents'][3]['content'] []= [
+				'Rata-rata', $igr_knn_neighbors, $avg_tp, $avg_tn, $avg_fp, $avg_fn, $avg_execution_time
+			];
+
+			require_once APPPATH . 'libraries/SpreadsheetHandler.php';
+			$excel = new SpreadsheetHandler();
+			$excel->write($data);
+		}
 	}
 }

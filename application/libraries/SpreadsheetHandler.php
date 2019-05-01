@@ -1,6 +1,11 @@
 <?php 
 
+defined('START_UPPER') or define('START_UPPER', 65);
+defined('END_UPPER') or define('END_UPPER', 90);
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
 
 class SpreadsheetHandler
 {
@@ -42,6 +47,42 @@ class SpreadsheetHandler
 		$spreadsheet 	= $this->reader->load($filepath);
 		$sheet 			= $spreadsheet->getActiveSheet();
 		return $sheet;
+	}
+
+	public function write($data, $filename = 'export.xlsx')
+	{
+		$spreadsheet = new Spreadsheet();
+		$writer = new PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+
+		for ($i = 0; $i < count($data['contents']) - 1; $i++)
+		{
+			$spreadsheet->createSheet();
+		}
+		
+		for ($k = 0; $k < count($data['contents']); $k++)
+		{
+			$spreadsheet->setActiveSheetIndex($k);
+			$activeSheet = $spreadsheet->getActiveSheet();
+			foreach ($data['contents'][$k]['content'] as $i => $row)
+			{
+				foreach ($row as $j => $cell)
+				{
+					$activeSheet->setCellValue(chr(START_UPPER + $j) . ($i + 1), $cell);
+					$activeSheet->getStyle(chr(START_UPPER + $j) . ($i + 1))->applyFromArray([
+						'font' => [
+							'size'	=> 12,
+							'name'	=> 'Times New Roman'
+						]
+					]);
+				}
+			}	
+		}
+		
+
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment;filename="'. $filename .'"'); 
+		header('Cache-Control: max-age=0');
+		$writer->save('php://output', 'xlsx');
 	}
 
 	public function saveToGabungan($sheet)

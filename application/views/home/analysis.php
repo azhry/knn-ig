@@ -161,17 +161,17 @@
 								<th>Average</th>
 								<th colspan="8">
 									<?php if (isset($knn_results)): ?>
-										Accuracy: <?= round(array_sum(array_column($knn_results, 'accuracy')) / count($knn_results), 2) ?><br>
-										Sensitivity: <?= round(array_sum(array_column($knn_results, 'sensitivity')) / count($knn_results), 2) ?><br>
-										Specificity: <?= round(array_sum(array_column($knn_results, 'specificity')) / count($knn_results), 2) ?><br>
+										Accuracy: <?= array_sum(array_column($knn_results, 'accuracy')) / count($knn_results) ?><br>
+										Sensitivity: <?= array_sum(array_column($knn_results, 'sensitivity')) / count($knn_results) ?><br>
+										Specificity: <?= array_sum(array_column($knn_results, 'specificity')) / count($knn_results) ?><br>
 										Execution Time: <?= array_sum(array_column($knn_results, 'execution_time')) / count($knn_results) ?>s
 									<?php endif; ?>
 								</th>
 								<th colspan="8">
 									<?php if (isset($igr_knn_results)): ?>
-										Accuracy: <?= round(array_sum(array_column($igr_knn_results, 'accuracy')) / count($igr_knn_results), 2) ?><br>
-										Sensitivity: <?= round(array_sum(array_column($igr_knn_results, 'sensitivity')) / count($igr_knn_results), 2) ?><br>
-										Specificity: <?= round(array_sum(array_column($igr_knn_results, 'specificity')) / count($igr_knn_results), 2) ?><br>
+										Accuracy: <?= array_sum(array_column($igr_knn_results, 'accuracy')) / count($igr_knn_results) ?><br>
+										Sensitivity: <?= array_sum(array_column($igr_knn_results, 'sensitivity')) / count($igr_knn_results) ?><br>
+										Specificity: <?= array_sum(array_column($igr_knn_results, 'specificity')) / count($igr_knn_results) ?><br>
 										Execution Time: <?= array_sum(array_column($igr_knn_results, 'execution_time')) / count($igr_knn_results) ?>s
 									<?php endif; ?>
 								</th>
